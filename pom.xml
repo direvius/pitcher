@@ -23,7 +23,7 @@
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-server</artifactId>
+      <artifactId>jetty-client</artifactId>
       <version>8.1.2.v20120308</version>
     </dependency>
   </dependencies>
