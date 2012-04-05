@@ -17,10 +17,12 @@ import org.eclipse.jetty.client.HttpExchange;
  */
 public class App 
 {
-    private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(20);
+    private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(100);
     
     public static void main( String[] args )
     {
+        if(args.length<1) return;
+        final String url = args[0];
         final Runnable cannon = new Runnable() {
             HttpClient client;
             {
@@ -35,20 +37,20 @@ public class App
                 
             }
             public void run() {
-                ContentExchange exchange = new ContentExchange(true){
+                HttpExchange exchange = new ContentExchange(true){
                     @Override
                     protected void onResponseComplete() throws IOException{
                         int status = getResponseStatus();
                         if (status == 200){
                             Logger.getLogger(App.class.getName()).log(Level.INFO, "HTTP OK: {0}", status);
-                            Logger.getLogger(App.class.getName()).log(Level.INFO, getResponseContent());
+                            //Logger.getLogger(App.class.getName()).log(Level.INFO, getResponseContent());
                         }else{
                             Logger.getLogger(App.class.getName()).log(Level.INFO, "HTTP error: {0}", status);
                         }  
                     }
                 };
-                
-                exchange.setURL("http://ya.ru");
+                exchange = new SamplerHttpExchange();
+                exchange.setURL(url);
                 try {
                     client.send(exchange);
                 } catch (IOException ex) {
@@ -57,12 +59,16 @@ public class App
             }
             
         };
-        final ScheduledFuture<?> cannonHandle = scheduler.scheduleAtFixedRate(cannon, 1, 1, TimeUnit.SECONDS);
+        final ScheduledFuture<?> cannonHandle = scheduler.scheduleAtFixedRate(cannon, 50, 50, TimeUnit.MICROSECONDS);
         scheduler.schedule(new Runnable(){
 
             public void run() {
                 cannonHandle.cancel(true);
-                System.out.println( "Finished!" );
+                System.out.println( "Finished!");
+                for(String result: SampleCounter.get().getResults()){
+                    System.out.println(result);
+                }
+                System.exit(0);
             }
             
         }, 10, TimeUnit.SECONDS);
