@@ -20,7 +20,7 @@ public class TransactionLogger {
     }
     public static TransactionLogger get(){ return TransactionLoggerHolder.instanse; }
     public void log(String transactionID, long milliseconds, String status){
-        String logEntry = System.currentTimeMillis()/1000+"\t"+prefix+"."+transactionID+"."+status+"\t"+milliseconds;
+        String logEntry = System.currentTimeMillis()/1000+"\t"+prefix+transactionID+"."+status+"\t"+milliseconds;
         logger.info(logEntry);
     }
 }
